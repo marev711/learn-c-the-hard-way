@@ -13,14 +13,13 @@ char * getHomeDir()
   struct passwd *pw = getpwuid(uid);
 
   check(pw != NULL, "Failed to retrieve HOME for uid=%u", uid)
-  home_dir = malloc(strlen(pw->pw_dir) * sizeof(char*));
   home_dir = strdup(pw->pw_dir);
   return home_dir;
 error:
   if (home_dir != NULL) {
     free(home_dir);
   }
-  return -1;
+  return NULL;
 }
 
 
