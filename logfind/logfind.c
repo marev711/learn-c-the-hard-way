@@ -22,17 +22,34 @@ error:
   return NULL;
 }
 
+char ** getLogFiles(const char * myHome)
+{
+  const char* logfind_name = "/.logfind";
+  char* logfind_fullpath = malloc(strlen(myHome) + strlen(logfind_name));
+  strncpy(logfind_fullpath, myHome, strlen(myHome));
+  strncat(logfind_fullpath, logfind_name, strlen(logfind_name));
+  printf("logfind_fullpath: %c", *logfind_fullpath);
+  check(access(myHome, F_OK ) != -1, "Coulnd't find .logfind file %c", *logfind_fullpath);
+
+  error:
+    if(logfind_fullpath) {
+      free(logfind_fullpath);
+    }
+    return NULL;
+}
 
 int main(int argc, char *argv[])
 {
 
   FILE *file;
   char * myHome = getHomeDir();
-  printf("My home dir is: %s\n", myHome);
-  free(myHome);
-  //if access("
+  char ** myLogfiles = getLogFiles(myHome);
 
+  free(myHome);
   return 0;
 error:
+  if (myHome) {
+    free(myHome);
+  }
   return -1;
 }
