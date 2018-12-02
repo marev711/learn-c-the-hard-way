@@ -48,17 +48,16 @@ char** getLogFiles(const char* myHome)
 
   // Set up logfile pointer to pointer
   char** logfiles = malloc(MAX_NO_OF_LOGFILES * sizeof(char*));
-  for (int i=0; i<MAX_NO_OF_LOGFILES; i++){
+  /*for (int i=0; i<MAX_NO_OF_LOGFILES; i++){
     logfiles[i] = NULL;
-  }
-
-  //deallocate_logfiles(logfiles);
+  }*/
+  free(logfind_fullpath);
   return logfiles;
   error:
     if(logfind_fullpath) {
       free(logfind_fullpath);
     }
-    deallocate_logfiles(logfiles);
+    //deallocate_logfiles(logfiles);
     return NULL;
 }
 
@@ -68,16 +67,17 @@ int main(int argc, char *argv[])
   FILE *file;
   char * myHome = getHomeDir();
   char ** myLogfiles = getLogFiles(myHome);
+  free(myLogfiles);
 
-  deallocate_logfiles(myLogfiles);
+  //deallocate_logfiles(myLogfiles);
   free(myHome);
   return 0;
 error:
 if (myHome) {
   free(myHome);
 }
-if (myLogfiles) {
+/*if (myLogfiles) {
   deallocate_logfiles(myLogfiles);
-}
+}*/
   return -1;
 }
