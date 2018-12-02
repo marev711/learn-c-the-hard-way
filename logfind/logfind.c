@@ -31,7 +31,9 @@ void deallocate_logfiles(char** logfiles)
       free(logfiles[i]);
     }
   }
-  free(logfiles);
+  if (logfiles){
+    free(logfiles);
+  }
 }
 
 char** getLogFiles(const char* myHome)
@@ -39,20 +41,24 @@ char** getLogFiles(const char* myHome)
   const char* logfind_name = "/.logfind\0";
   char* logfind_fullpath = malloc(strlen(myHome) + strlen(logfind_name) + 1);
   logfind_fullpath[0] = '\0';
-  strncpy(logfind_fullpath, myHome, strlen(myHome));
+  strncpy(logfind_fullpath, myHome, strlen(myHome) + 1);
   strncat(logfind_fullpath, logfind_name, strlen(logfind_name));
   printf("logfind_fullpath: %s", logfind_fullpath);
-  check(access(logfind_fullpath, F_OK ) != -1, "Coulnd't find the /home/marev/.logfind file %c", *logfind_fullpath);
-  char** logfiles = malloc(MAX_NO_OF_LOGFILES * sizeof(char*));
+  check(access(logfind_fullpath, F_OK ) != -1, "Coulnd't find the .logfind file %c", *logfind_fullpath);
 
+  // Set up logfile pointer to pointer
+  char** logfiles = malloc(MAX_NO_OF_LOGFILES * sizeof(char*));
   for (int i=0; i<MAX_NO_OF_LOGFILES; i++){
     logfiles[i] = NULL;
   }
-  deallocate_logfiles(logfiles);
+
+  //deallocate_logfiles(logfiles);
+  return logfiles;
   error:
     if(logfind_fullpath) {
       free(logfind_fullpath);
     }
+    deallocate_logfiles(logfiles);
     return NULL;
 }
 
@@ -63,11 +69,15 @@ int main(int argc, char *argv[])
   char * myHome = getHomeDir();
   char ** myLogfiles = getLogFiles(myHome);
 
+  deallocate_logfiles(myLogfiles);
   free(myHome);
   return 0;
 error:
-  if (myHome) {
-    free(myHome);
-  }
+if (myHome) {
+  free(myHome);
+}
+if (myLogfiles) {
+  deallocate_logfiles(myLogfiles);
+}
   return -1;
 }
