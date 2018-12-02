@@ -5,7 +5,9 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-char * getHomeDir()
+#define MAX_NO_OF_LOGFILES 100
+
+char* getHomeDir()
 {
   char * home_dir = NULL;
   // Get HOME dir for current user
@@ -22,15 +24,31 @@ error:
   return NULL;
 }
 
-char ** getLogFiles(const char * myHome)
+void deallocate_logfiles(char** logfiles)
 {
-  const char* logfind_name = "/.logfind";
-  char* logfind_fullpath = malloc(strlen(myHome) + strlen(logfind_name));
+  for (int i=0; i<MAX_NO_OF_LOGFILES; i++){
+    if (logfiles[i]){
+      free(logfiles[i]);
+    }
+  }
+  free(logfiles);
+}
+
+char** getLogFiles(const char* myHome)
+{
+  const char* logfind_name = "/.logfind\0";
+  char* logfind_fullpath = malloc(strlen(myHome) + strlen(logfind_name) + 1);
+  logfind_fullpath[0] = '\0';
   strncpy(logfind_fullpath, myHome, strlen(myHome));
   strncat(logfind_fullpath, logfind_name, strlen(logfind_name));
-  printf("logfind_fullpath: %c", *logfind_fullpath);
-  check(access(myHome, F_OK ) != -1, "Coulnd't find .logfind file %c", *logfind_fullpath);
+  printf("logfind_fullpath: %s", logfind_fullpath);
+  check(access(logfind_fullpath, F_OK ) != -1, "Coulnd't find the /home/marev/.logfind file %c", *logfind_fullpath);
+  char** logfiles = malloc(MAX_NO_OF_LOGFILES * sizeof(char*));
 
+  for (int i=0; i<MAX_NO_OF_LOGFILES; i++){
+    logfiles[i] = NULL;
+  }
+  deallocate_logfiles(logfiles);
   error:
     if(logfind_fullpath) {
       free(logfind_fullpath);
